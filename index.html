@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>✨ 发现真实的自我 · 保存结果卡片</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #f9f3e8 0%, #ffe9f0 45%, #e1eefa 100%);
+      background-attachment: fixed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem 1rem;
+    }
+
+    .test-card {
+      max-width: 750px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 2.5rem;
+      box-shadow: 0 30px 60px -20px rgba(55, 30, 50, 0.25), 0 8px 20px -8px rgba(255, 200, 220, 0.6), inset 0 1px 2px rgba(255,255,255,0.8);
+      padding: 2.2rem 1.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      transition: all 0.3s ease;
+    }
+
+    /* 封面样式 */
+    .cover {
+      text-align: center;
+      padding: 1rem 0.5rem;
+    }
+    .cover h1 {
+      font-size: 2.8rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(130deg, #2e3b4e, #865d6e, #4f7090);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.8rem;
+      line-height: 1.2;
+    }
+    .cover .sub {
+      font-size: 1.3rem;
+      color: #6d5c6b;
+      margin-bottom: 2.5rem;
+      font-weight: 320;
+      border-left: none;
+      padding-left: 0;
+    }
+    .cover-icon {
+      font-size: 5rem;
+      margin-bottom: 2rem;
+      filter: drop-shadow(0 10px 15px rgba(180,130,150,0.3));
+    }
+    .start-btn {
+      background: #b3849b;
+      color: white;
+      border: none;
+      padding: 1.3rem 3rem;
+      border-radius: 3rem;
+      font-size: 1.5rem;
+      font-weight: 550;
+      cursor: pointer;
+      transition: 0.2s;
+      box-shadow: 0 15px 25px -12px #b3849b;
+      border: 1px solid #ffd9e8;
+      margin-top: 1.5rem;
+      width: 80%;
+      max-width: 320px;
+    }
+    .start-btn:hover {
+      background: #c27499;
+      transform: translateY(-3px);
+    }
+
+    /* 测试区域（分页） */
+    .test-area {
+      transition: opacity 0.2s;
+    }
+    .progress-indicator {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      color: #b28e9c;
+      background: rgba(255,240,245,0.5);
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      backdrop-filter: blur(4px);
+    }
+    .question-count {
+      font-weight: 600;
+      color: #8a6c7c;
+    }
+    .dimension-tag {
+      font-style: italic;
+      background: #f3d9e2;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+    }
+
+    .question-box {
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 2rem;
+      padding: 1.8rem 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid rgba(255, 245, 250, 0.8);
+      box-shadow: 0 8px 16px -12px rgba(120, 70, 100, 0.2);
+    }
+
+    .question-text {
+      font-weight: 600;
+      font-size: 1.5rem;
+      color: #2f2630;
+      margin-bottom: 2rem;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .options-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .option-btn {
+      flex: 1 1 250px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1.5px solid rgba(255, 220, 235, 0.9);
+      border-radius: 2rem;
+      padding: 1.2rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 470;
+      color: #362f38;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.18s ease;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+    }
+
+    .option-btn:hover {
+      background: rgba(255, 240, 250, 0.9);
+      border-color: #fec6d7;
+      transform: scale(1.02);
+    }
+
+    .option-btn.active {
+      background: linear-gradient(115deg, #ffe7ef, #ffffff);
+      border-color: #d48ea8;
+      box-shadow: 0 10px 20px -15px #b38298, 0 0 0 3px rgba(255, 230, 240, 0.7);
+      color: #2f2930;
+      font-weight: 530;
+    }
+
+    .option-btn .emoji-bullet {
+      font-size: 1.8rem;
+      filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.05));
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+
+    .nav-btn {
+      border: none;
+      padding: 1rem 2.2rem;
+      border-radius: 3rem;
+      font-size: 1.2rem;
+      font-weight: 520;
+      cursor: pointer;
+      transition: 0.2s;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 18px -12px rgba(110, 60, 80, 0.3);
+    }
+
+    .prev-btn {
+      background: rgba(255, 245, 250, 0.8);
+      color: #624e5b;
+      border: 1px solid #ffe1ec;
+    }
+    .next-btn, .result-btn {
+      background: #b3849b;
+      color: white;
+      border: 1px solid #ffd9e8;
+      flex: 1 1 180px;
+    }
+    .nav-btn:disabled {
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* 结果区域——详细版 */
+    #result-area {
+      margin-top: 1rem;
+      padding: 1.8rem 1.5rem;
+      border-radius: 2.5rem;
+      background: rgba(255, 240, 245, 0.5);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 220, 240, 0.9);
+    }
+
+    .result-header {
+      text-align: center;
+      margin-bottom: 1.8rem;
+    }
+    .result-type {
+      font-size: 4rem;
+      font-weight: 650;
+      letter-spacing: 2px;
+      background: linear-gradient(140deg, #4d3b48, #ab7085);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.2;
+      text-shadow: 2px 2px 10px rgba(255, 180, 200, 0.5);
+    }
+    .result-name {
+      font-size: 2.2rem;
+      font-weight: 500;
+      color: #4a3643;
+      margin-top: 0.2rem;
+    }
+
+    .detail-card {
+      background: rgba(255, 250, 250, 0.7);
+      border-radius: 2rem;
+      padding: 1.4rem 1.6rem;
+      margin: 1.2rem 0;
+      border: 1px solid rgba(255, 220, 235, 0.7);
+    }
+
+    .detail-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #563d4f;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid #f4cedb;
+      padding-bottom: 0.4rem;
+    }
+
+    .detail-text {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      color: #372e35;
+      text-align: left;
+    }
+
+    .badge-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin: 1.2rem 0 0.8rem;
+    }
+    .badge {
+      background: #ecd7e2;
+      padding: 0.4rem 1.2rem;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #4f2f41;
+      border: 1px solid white;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+    }
+    .primary-btn, .secondary-btn {
+      border: none;
+      padding: 1rem 1.5rem;
+      border-radius: 3rem;
+      font-size: 1.1rem;
+      font-weight: 520;
+      cursor: pointer;
+      transition: 0.2s;
+      backdrop-filter: blur(5px);
+      width: 100%;
+    }
+    .primary-btn {
+      background: #b3849b;
+      color: white;
+      border: 1px solid #ffd9e8;
+    }
+    .primary-btn:hover {
+      background: #c27499;
+    }
+    .secondary-btn {
+      background: rgba(255, 245, 250, 0.9);
+      color: #624e5b;
+      border: 1px solid #ffe1ec;
+    }
+    .secondary-btn:hover {
+      background: #ffe3f0;
+    }
+
+    /* 免责声明样式 */
+    .disclaimer {
+      font-size: 0.8rem;
+      color: #a8899a;
+      text-align: center;
+      margin-top: 1.8rem;
+      padding: 0.8rem 1rem;
+      border-top: 1px dashed #dbbfd0;
+      line-height: 1.5;
+    }
+    .disclaimer i {
+      font-style: italic;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .foot-note {
+      margin-top: 1.2rem;
+      text-align: center;
+      color: #bb9dae;
+      font-size: 0.9rem;
+      backdrop-filter: blur(4px);
+    }
+  </style>
+</head>
+<body>
+<div class="test-card" id="app">
+  <!-- 封面页 -->
+  <div id="cover" class="cover">
+    <div class="cover-icon">🧘</div>
+    <h1>发现真实的自我</h1>
+    <div class="sub">MBTI 深度解析 · 20题精准版</div>
+    <button class="start-btn" id="start-test">开始测试</button>
+    <div style="margin-top: 2rem; font-size: 0.95rem; color: #ac93a3;">20道倾向选择题 · 约5分钟</div>
+    <!-- 封面免责声明（轻量） -->
+    <div class="disclaimer" style="border-top: none; margin-top: 2rem;">
+      <i>免责声明：本测试结果基于MBTI理论编制，仅供娱乐与自我探索，并非专业心理评估。</i>
+    </div>
+  </div>
+
+  <!-- 测试页（分题） -->
+  <div id="test-area" class="test-area hidden">
+    <div class="progress-indicator">
+      <span class="question-count" id="current-q">1 / 20</span>
+      <span class="dimension-tag" id="dimension-tag">⚡️ 精力</span>
+    </div>
+
+    <div class="question-box">
+      <div class="question-text" id="question-text">加载中...</div>
+      <div class="options-row" id="options-container"></div>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="nav-btn prev-btn" id="prev-btn" disabled>← 上一题</button>
+      <button class="nav-btn next-btn" id="next-btn">下一题 →</button>
+      <button class="nav-btn result-btn hidden" id="result-btn">🔍 查看结果</button>
+    </div>
+  </div>
+
+  <!-- 结果页（详细版 + 保存卡片功能） -->
+  <div id="result-area" class="hidden">
+    <div class="result-header">
+      <div class="result-type" id="result-type">INTJ</div>
+      <div class="result-name" id="result-name">建筑师</div>
+    </div>
+
+    <!-- 详细描述区块 -->
+    <div class="detail-card">
+      <div class="detail-title">📖 性格总览</div>
+      <div class="detail-text" id="result-overview">
+        富有想象力和战略性的思考家，一切都在计划之中。理性果断，追求极致。
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-title">✨ 典型特质</div>
+      <div class="detail-text" id="result-traits">
+        · 独立理性，善于分析<br>· 目标感极强，不达目的不罢休<br>· 对新观念保持开放，但要求逻辑自洽
+      </div>
+    </div>
+
+    <div class="detail-card">
+      <div class="detail-title">💼 职业倾向</div>
+      <div class="detail-text" id="result-career">
+        科学家、战略顾问、建筑师、工程师、金融分析师等需要深度思考和长远规划的角色。
+      </div>
+    </div>
+
+    <div class="badge-container" id="badge-container">
+      <span class="badge">#理性者</span>
+      <span class="badge">#远见家</span>
+      <span class="badge">#独立</span>
+    </div>
+
+    <!-- 操作按钮组 -->
+    <div class="action-buttons">
+      <button class="primary-btn" id="save-card-btn">📸 保存结果卡片</button>
+      <button class="secondary-btn" id="restart-btn">🔄 重新测试</button>
+    </div>
+
+    <!-- 结果页免责声明 -->
+    <div class="disclaimer">
+      ⚠️ <i>免责声明：本测试结果基于MBTI理论编制，仅供娱乐与自我探索，不构成任何专业心理评估或建议。如有需要，请咨询专业心理工作者。</i>
+    </div>
+  </div>
+
+  <!-- 隐藏的画布，用于生成卡片 -->
+  <canvas id="card-canvas" style="display:none;" width="600" height="800"></canvas>
+</div>
+<div class="foot-note">🌸 倾听内心 · 每一面都是真实的你</div>
+
+<script>
+  (function() {
+    // ---------- 20题题库（与之前相同）----------
+    const questions = [
+      // E/I 1-5
+      { text: "在社交聚会后，你的精力状态如何？", 
+        optionA: { text: "感觉充满电，还想继续聊", type: "E" }, 
+        optionB: { text: "需要独处恢复，有点累", type: "I" } },
+      { text: "当你需要解决一个难题时，你更倾向于？", 
+        optionA: { text: "找人讨论，边想边说", type: "E" }, 
+        optionB: { text: "安静沉思，自己消化", type: "I" } },
+      { text: "以下哪个描述更符合你？", 
+        optionA: { text: "我通常是活跃气氛的人", type: "E" }, 
+        optionB: { text: "我通常是观察气氛的人", type: "I" } },
+      { text: "工作/学习休息时，你更喜欢？", 
+        optionA: { text: "和同事/同学闲聊", type: "E" }, 
+        optionB: { text: "独自散步或听音乐", type: "I" } },
+      { text: "当你听到一个好主意，你的第一反应是？", 
+        optionA: { text: "马上分享给身边的人", type: "E" }, 
+        optionB: { text: "先自己琢磨一会儿", type: "I" } },
+      
+      // S/N 6-10
+      { text: "你更容易记住？", 
+        optionA: { text: "实际发生过的具体细节", type: "S" }, 
+        optionB: { text: "事件带来的感觉和联想", type: "N" } },
+      { text: "阅读或看电影时，你更关注？", 
+        optionA: { text: "情节和事实是否合理", type: "S" }, 
+        optionB: { text: "隐喻、象征和深层含义", type: "N" } },
+      { text: "日常中你更喜欢？", 
+        optionA: { text: "按经验办事，可靠踏实", type: "S" }, 
+        optionB: { text: "尝试新方法，哪怕不稳定", type: "N" } },
+      { text: "学习新技能时，你更看重？", 
+        optionA: { text: "清晰的步骤和实用技巧", type: "S" }, 
+        optionB: { text: "背后的原理和未来可能", type: "N" } },
+      { text: "对于描述事物，你更倾向于？", 
+        optionA: { text: "如实描述，不添油加醋", type: "S" }, 
+        optionB: { text: "加入想象和比喻", type: "N" } },
+      
+      // T/F 11-15
+      { text: "做决定时，你通常优先考虑？", 
+        optionA: { text: "逻辑是否正确、公平", type: "T" }, 
+        optionB: { text: "对相关人员的影响和感受", type: "F" } },
+      { text: "朋友向你倾诉时，你更多是？", 
+        optionA: { text: "帮ta分析问题根源", type: "T" }, 
+        optionB: { text: "共情情绪，提供安慰", type: "F" } },
+      { text: "你更容易被什么说服？", 
+        optionA: { text: "清晰的数据和因果", type: "T" }, 
+        optionB: { text: "动人的故事和价值", type: "F" } },
+      { text: "当你和他人产生分歧，你更倾向于？", 
+        optionA: { text: "坚持对错，摆出事实", type: "T" }, 
+        optionB: { text: "照顾关系，求同存异", type: "F" } },
+      { text: "评价一个方案时，你更看重？", 
+        optionA: { text: "效率和结果", type: "T" }, 
+        optionB: { text: "团队的参与感", type: "F" } },
+      
+      // J/P 16-20
+      { text: "你喜欢生活？", 
+        optionA: { text: "井井有条，按计划进行", type: "J" }, 
+        optionB: { text: "随性灵活，留出空白", type: "P" } },
+      { text: "对于截止日期，你通常？", 
+        optionA: { text: "提前规划，尽早完成", type: "J" }, 
+        optionB: { text: "最后时刻效率最高", type: "P" } },
+      { text: "哪种描述更接近你？", 
+        optionA: { text: "喜欢事情有个定论", type: "J" }, 
+        optionB: { text: "喜欢保持开放选择", type: "P" } },
+      { text: "你的工作/学习空间通常是？", 
+        optionA: { text: "整洁有序，物品归位", type: "J" }, 
+        optionB: { text: "随性堆放，但自己找得到", type: "P" } },
+      { text: "对于旅行计划，你更倾向？", 
+        optionA: { text: "详细行程，按表游玩", type: "J" }, 
+        optionB: { text: "大概方向，随心探索", type: "P" } }
+    ];
+
+    // ---------- 16型人格详细解析 ----------
+    const personalityDetails = {
+      "INTJ": {
+        name: "建筑师",
+        overview: "INTJ（建筑师）是富有想象力和战略性的思考家，喜欢将一切纳入计划之中。他们理性果断，追求极致，对知识和能力有着无止境的渴望。",
+        traits: "· 独立理性，善于分析，喜欢长期规划\n· 目标感极强，不达目的不罢休\n· 对新观念保持开放，但要求逻辑自洽\n· 在社交中通常显得内敛，但在自己擅长的领域自信十足",
+        career: "科学家、战略顾问、建筑师、工程师、金融分析师、系统架构师等需要深度思考和长远规划的角色。",
+        badges: ["#理性者", "#远见家", "#独立", "#战略家"]
+      },
+      "INTP": {
+        name: "逻辑家",
+        overview: "INTP（逻辑家）是好奇的发明家，渴求知识，善于分析，喜欢挑战抽象理论。他们热爱逻辑和思考，不断探寻事物背后的原理。",
+        traits: "· 极度好奇，喜欢钻研理论\n· 灵活开放，适应力强\n· 对条条框框感到束缚，喜欢自由探索\n· 在社交中可能显得心不在焉，因为大脑总在思考",
+        career: "哲学家、数学家、程序员、研究员、大学教授、发明家。",
+        badges: ["#思考者", "#理论家", "#好奇", "#不拘一格"]
+      },
+      "ENTJ": {
+        name: "指挥官",
+        overview: "ENTJ（指挥官）是果敢的领袖，天生擅长组织和领导。他们善于制定长远目标并推动团队前进，具有强大的执行力和决断力。",
+        traits: "· 自信果断，善于决策\n· 出色的组织能力和远见\n· 喜欢挑战和竞争\n· 有时显得强势，但目标纯粹是为了高效",
+        career: "CEO、企业家、项目经理、法官、政治家、管理顾问。",
+        badges: ["#领导者", "#果断", "#战略家", "#高效"]
+      },
+      "ENTP": {
+        name: "辩论家",
+        overview: "ENTP（辩论家）是聪颖好奇的发明家，擅长辩论，享受思维碰撞。他们不断挑战新可能，富有创意和幽默感。",
+        traits: "· 机敏睿智，反应极快\n· 热爱头脑风暴，喜欢挑战观念\n· 适应力强，讨厌例行公事\n· 善于发现新机会，但可能缺乏坚持",
+        career: "企业家、律师、营销策划、创意总监、发明家、媒体人。",
+        badges: ["#创意", "#善辩", "#灵活", "#开拓者"]
+      },
+      "INFJ": {
+        name: "提倡者",
+        overview: "INFJ（提倡者）是沉静而神秘的理想主义者，关心他人，富有洞察力和创造力。他们追求意义和深度，希望让世界变得更美好。",
+        traits: "· 深刻的同理心和洞察力\n· 坚持内心价值观，理想主义\n· 善于倾听和鼓励\n· 有时过于追求完美，容易内耗",
+        career: "心理咨询师、作家、教师、社会工作者、人力资源、非营利组织。",
+        badges: ["#理想主义", "#共情者", "#深刻", "#温和"]
+      },
+      "INFP": {
+        name: "调停者",
+        overview: "INFP（调停者）是诗意善良的利他主义者，守护内心价值观，温暖但坚定。他们善于理解他人，追求真实和美好。",
+        traits: "· 内心世界丰富，充满想象力\n· 真诚善良，乐于帮助他人\n· 适应力强，但原则问题绝不动摇\n· 有时过于敏感，需要独处充电",
+        career: "设计师、作家、心理咨询师、社会服务、艺术工作者。",
+        badges: ["#治愈者", "#理想主义", "#真诚", "#艺术气质"]
+      },
+      "ENFJ": {
+        name: "主人公",
+        overview: "ENFJ（主人公）是魅力四射的领导者，善于鼓舞人心，富有同理心。他们天生具有感染力，乐于帮助他人成长。",
+        traits: "· 热情外向，善于交际\n· 卓越的沟通和激励能力\n· 关注他人感受，善于调解\n· 有时过度投入他人事务",
+        career: "教师、培训师、公关、政治家、人力资源、非营利组织领导者。",
+        badges: ["#教育家", "#魅力者", "#热心", "#鼓舞者"]
+      },
+      "ENFP": {
+        name: "竞选者",
+        overview: "ENFP（竞选者）是热情洋溢，自由奔放的探索者，富有感染力，总能发现新可能。他们热爱生活，充满好奇心。",
+        traits: "· 充满热情，善于交际\n· 创意无限，喜欢新鲜事物\n· 适应力强，讨厌束缚\n· 有时注意力容易分散",
+        career: "市场专员、活动策划、记者、艺术家、心理咨询师、企业家。",
+        badges: ["#追梦者", "#热情", "#创意", "#社交达人"]
+      },
+      "ISTJ": {
+        name: "物流师",
+        overview: "ISTJ（物流师）是正直务实的守护者，逻辑清晰，值得信赖，坚守承诺和传统。他们注重事实和细节，是可靠的执行者。",
+        traits: "· 责任心极强，说到做到\n· 有条理，喜欢计划和秩序\n· 实事求是，尊重事实\n· 有时显得保守，不喜变动",
+        career: "会计师、审计员、律师、公务员、项目经理、数据分析师。",
+        badges: ["#可靠", "#务实", "#守序", "#尽责"]
+      },
+      "ISFJ": {
+        name: "守护者",
+        overview: "ISFJ（守护者）是细心温柔的奉献者，默默关注他人需求，是可靠的守护者。他们重视和谐，乐于助人。",
+        traits: "· 体贴周到，善于照顾人\n· 注重细节，有条理\n· 忠诚可靠，默默付出\n· 有时过度牺牲自我",
+        career: "护士、教师、行政助理、社工、家庭医生、图书馆员。",
+        badges: ["#温暖", "#奉献者", "#细致", "#忠诚"]
+      },
+      "ESTJ": {
+        name: "总经理",
+        overview: "ESTJ（总经理）是高效率的管理者，注重秩序，执行力强，推动事物运转。他们喜欢掌控局面，确保事事井井有条。",
+        traits: "· 果断务实，善于组织\n· 遵循规则和流程\n· 责任心强，目标明确\n· 有时缺乏灵活性",
+        career: "企业高管、项目经理、军官、法官、银行家、行政主管。",
+        badges: ["#管理者", "#高效", "#权威", "#务实"]
+      },
+      "ESFJ": {
+        name: "执政官",
+        overview: "ESFJ（执政官）是热心友善的社交家，重视和谐，乐于助人，是群体中的凝聚力。他们热情好客，关注他人感受。",
+        traits: "· 热情周到，善解人意\n· 喜欢合作，维护传统\n· 注重实际，乐于奉献\n· 有时过于在意他人看法",
+        career: "销售、公关、活动策划、社工、医疗护理、教育工作者。",
+        badges: ["#热心肠", "#社交家", "#合作者", "#尽职"]
+      },
+      "ISTP": {
+        name: "鉴赏家",
+        overview: "ISTP（鉴赏家）是冷静机敏的探险者，善于使用工具，喜欢动手操作。他们灵活应变，享受探索事物的原理。",
+        traits: "· 冷静理智，擅长分析\n· 动手能力强，喜欢实操\n· 适应力强，喜欢冒险\n· 有时显得冷漠，独来独往",
+        career: "工程师、机械师、法医、运动员、程序员、建筑师。",
+        badges: ["#巧手", "#探险者", "#冷静", "#灵活"]
+      },
+      "ISFP": {
+        name: "探险家",
+        overview: "ISFP（探险家）是灵动艺术家，享受当下，用行动和感官体验世界。他们温柔敏感，追求美和自由。",
+        traits: "· 艺术气质浓厚，审美独特\n· 温和友善，不喜欢冲突\n· 活在当下，随遇而安\n· 有时缺乏长远规划",
+        career: "艺术家、设计师、音乐人、厨师、摄影师、户外教练。",
+        badges: ["#艺术家", "#自由", "#感性", "#温柔"]
+      },
+      "ESTP": {
+        name: "企业家",
+        overview: "ESTP（企业家）是精力充沛的行动派，随机应变，擅长谈判和抓住机会。他们活在当下，热爱挑战和冒险。",
+        traits: "· 机智灵活，反应迅速\n· 善于说服和谈判\n· 热爱刺激，敢于冒险\n· 有时缺乏耐心，容易冲动",
+        career: "创业者、销售精英、运动员、警察、交易员、导游。",
+        badges: ["#行动派", "#冒险家", "#善辩", "#精力充沛"]
+      },
+      "ESFP": {
+        name: "表演者",
+        overview: "ESFP（表演者）是活力四射的表演家，热爱生活，走到哪里都带来欢乐。他们享受当下，乐于与人分享快乐。",
+        traits: "· 热情开朗，善于活跃气氛\n· 即兴能力强，喜欢表现\n· 乐于助人，真诚友好\n· 有时缺乏长远计划",
+        career: "演员、主持人、导游、幼师、市场专员、活动策划。",
+        badges: ["#气氛组", "#热情", "#表演者", "#乐天派"]
+      }
+    };
+
+    // 补全默认描述
+    const getPersonality = (type) => personalityDetails[type] || {
+      name: "探索者",
+      overview: "你的性格独一无二，继续探索自我吧。",
+      traits: "· 多维度的性格组合\n· 适应性强\n· 持续成长中",
+      career: "任何能发挥你潜能的领域",
+      badges: ["#独特", "#成长"]
+    };
+
+    // 获取页面元素
+    const cover = document.getElementById('cover');
+    const testArea = document.getElementById('test-area');
+    const resultArea = document.getElementById('result-area');
+
+    const startBtn = document.getElementById('start-test');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const resultBtn = document.getElementById('result-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const saveCardBtn = document.getElementById('save-card-btn');
+
+    const questionText = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const currentQSpan = document.getElementById('current-q');
+    const dimensionTag = document.getElementById('dimension-tag');
+
+    // 结果元素
+    const resultType = document.getElementById('result-type');
+    const resultName = document.getElementById('result-name');
+    const resultOverview = document.getElementById('result-overview');
+    const resultTraits = document.getElementById('result-traits');
+    const resultCareer = document.getElementById('result-career');
+    const badgeContainer = document.getElementById('badge-container');
+
+    // Canvas
+    const canvas = document.getElementById('card-canvas');
+    const ctx = canvas.getContext('2d');
+
+    // 状态
+    let currentIndex = 0;
+    let answers = new Array(questions.length).fill(null);
+    let currentMbti = '';
+    let currentPersonality = null;
+
+    // 辅助函数：根据类型返回emoji
+    function getEmojiForType(type) {
+      const map = {
+        'E': '💬', 'I': '🌙', 'S': '🔍', 'N': '🌈',
+        'T': '📊', 'F': '❤️', 'J': '📌', 'P': '🎐'
+      };
+      return map[type] || '✨';
+    }
+
+    function getDimensionTag(index) {
+      if (index < 5) return '⚡️ 外向 · 内向';
+      else if (index < 10) return '🌿 实感 · 直觉';
+      else if (index < 15) return '⚖️ 思考 · 情感';
+      else return '📅 判断 · 感知';
+    }
+
+    function renderQuestion(index) {
+      const q = questions[index];
+      questionText.innerText = q.text;
+      dimensionTag.innerText = getDimensionTag(index);
+      
+      let optionsHtml = '';
+      const opts = [q.optionA, q.optionB];
+      opts.forEach(opt => {
+        const isActive = (answers[index] === opt.type) ? 'active' : '';
+        optionsHtml += `
+          <div class="option-btn ${isActive}" data-type="${opt.type}">
+            <span class="emoji-bullet">${getEmojiForType(opt.type)}</span>
+            ${opt.text}
+          </div>
+        `;
+      });
+      optionsContainer.innerHTML = optionsHtml;
+
+      document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const selectedType = btn.getAttribute('data-type');
+          optionsContainer.querySelectorAll('.option-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          answers[index] = selectedType;
+        });
+      });
+
+      currentQSpan.innerText = `${index+1} / ${questions.length}`;
+    }
+
+    function updateNavButtons() {
+      prevBtn.disabled = (currentIndex === 0);
+      if (currentIndex === questions.length - 1) {
+        nextBtn.classList.add('hidden');
+        resultBtn.classList.remove('hidden');
+      } else {
+        nextBtn.classList.remove('hidden');
+        resultBtn.classList.add('hidden');
+      }
+    }
+
+    function goToPrev() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion(currentIndex);
+        updateNavButtons();
+      }
+    }
+
+    function goToNext() {
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        renderQuestion(currentIndex);
+        updateNavButtons();
+      }
+    }
+
+    function calculateResult() {
+      if (answers.includes(null)) {
+        alert('请先完成所有题目，再查看结果。');
+        return false;
+      }
+
+      let countE=0, countI=0, countS=0, countN=0, countT=0, countF=0, countJ=0, countP=0;
+      answers.forEach(type => {
+        switch(type) {
+          case 'E': countE++; break;
+          case 'I': countI++; break;
+          case 'S': countS++; break;
+          case 'N': countN++; break;
+          case 'T': countT++; break;
+          case 'F': countF++; break;
+          case 'J': countJ++; break;
+          case 'P': countP++; break;
+        }
+      });
+
+      const first = countE > countI ? 'E' : 'I';
+      const second = countS > countN ? 'S' : 'N';
+      const third = countT > countF ? 'T' : 'F';
+      const fourth = countJ > countP ? 'J' : 'P';
+      const mbti = first + second + third + fourth;
+      const info = getPersonality(mbti);
+
+      // 保存全局
+      currentMbti = mbti;
+      currentPersonality = info;
+
+      resultType.innerText = mbti;
+      resultName.innerText = info.name;
+      resultOverview.innerText = info.overview;
+      resultTraits.innerText = info.traits;
+      resultCareer.innerText = info.career;
+
+      // 生成标签
+      let badgesHtml = '';
+      info.badges.forEach(b => {
+        badgesHtml += `<span class="badge">${b}</span>`;
+      });
+      badgeContainer.innerHTML = badgesHtml;
+
+      return true;
+    }
+
+    function showResult() {
+      if (!calculateResult()) return;
+      testArea.classList.add('hidden');
+      resultArea.classList.remove('hidden');
+    }
+
+    function resetToCover() {
+      currentIndex = 0;
+      answers = new Array(questions.length).fill(null);
+      cover.classList.remove('hidden');
+      testArea.classList.add('hidden');
+      resultArea.classList.add('hidden');
+    }
+
+    function startTest() {
+      cover.classList.add('hidden');
+      testArea.classList.remove('hidden');
+      resultArea.classList.add('hidden');
+      currentIndex = 0;
+      answers = new Array(questions.length).fill(null);
+      renderQuestion(0);
+      updateNavButtons();
+    }
+
+    // 生成并保存结果卡片
+    function generateCard() {
+      if (!currentMbti || !currentPersonality) {
+        alert('请先完成测试获得结果');
+        return;
+      }
+
+      // 设置画布背景
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // 渐变背景
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#f9e7f0');
+      gradient.addColorStop(0.5, '#ffe9ee');
+      gradient.addColorStop(1, '#e8def0');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // 装饰圆点
+      ctx.fillStyle = '#ffffff40';
+      ctx.beginPath();
+      ctx.arc(500, 100, 120, 0, 2*Math.PI);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(80, 650, 150, 0, 2*Math.PI);
+      ctx.fill();
+
+      // 标题
+      ctx.font = 'bold 36px "Inter", "Segoe UI", sans-serif';
+      ctx.fillStyle = '#4d3b48';
+      ctx.fillText('发现真实的自我', 60, 90);
+
+      // 类型大号字
+      ctx.font = 'bold 120px "Inter", "Segoe UI", sans-serif';
+      ctx.fillStyle = '#ab7085';
+      ctx.fillText(currentMbti, 60, 250);
+
+      // 类型名称
+      ctx.font = 'bold 48px "Inter", "Segoe UI", sans-serif';
+      ctx.fillStyle = '#4a3643';
+      ctx.fillText(currentPersonality.name, 60, 350);
+
+      // 性格总览 (换行处理)
+      ctx.font = '24px "Inter", "Segoe UI", sans-serif';
+      ctx.fillStyle = '#372e35';
+      const overviewWords = currentPersonality.overview;
+      const maxWidth = 480;
+      const lineHeight = 40;
+      let y = 440;
+      let lines = [];
+      let line = '';
+      let words = overviewWords.split('');
+      for (let i = 0; i < words.length; i++) {
+        let testLine = line + words[i];
+        let   让   指标 metrics      指标指标 = ctx.measureText(testLine);
+        如果指标。width > maxWidth && i   我 > 0) {if   如果 (metrics   指标.width   宽度 > maxWidth && i   我 > 0) {
+             lines.push   推(线);lines      行行.push   推(line   行);
+             Line = words   单词[i   我]；line = words   单词[i   我];
+             y = lineHeight；y += lineHeight;
+        } else   其他 {
+             line = testLine；line = testLine;
+        }
+      }
+         lines.push   推(线);lines      行行.push   推(line   行);
+         Y = 440；y = 440;
+      行。forEach((1, index) => {lines      行行.forEach((l, index   指数) => {
+        ctx.fillText(1,60, y index * lineHeight)；ctx.fillText(l, 60, y + index   指数 * lineHeight);
+      });
+
+      // 特质摘要（取前两行）
+      ctx.font   字体 = '20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif';ctx.font   字体 = '20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''2'20px "Inter", "Segoe UI", sans-serif'0px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif''20px "Inter", "Segoe UI", sans-serif';
+      ctx.fillStyle = '#624e5b'   “# 624 e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”   e5b”;
+      const   常量 traitsShort = currentPersonality.traits   特征.split   分裂('\n').slice（0,2）。Join   ）。加入   ）。加入 (' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · ')；const    ;常量traitsShort = currentPersonality.traits   特征.split   分裂('\n').slice   片(0,2).join   加入(' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · '   ' · ');
+      ctx.fillText(traitsShort, 60,620,480)；ctx.fillText(traitsShort, 60, 620, 480);
+
+      // 底部免责声明小字
+      ctx.font   字体 = '16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif';ctx.font   字体   字体 = '16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif''16px "Inter", "Segoe UI", sans-serif';
+      ctx.fillStyle = '#a8899a';
+      ctx.fillText('✨ 仅供娱乐 · 长按保存分享', 60, 720);ctx.fillText('✨ 仅供娱乐 · 长按保存分享', 60, 720);
+
+      // 生成图片并触发下载
+      const   常量   常量 dataURL = canvas      帆布帆布.toDataURL('image/png'   图像/ png   图像/ png)；const    ;常量dataURL = canvas      帆布帆布.toDataURL('image/png'   图像/ png   图像/ png);
+      const   常量      链接常量 link         链接链接链接 = document      文档文档.createElement('a'   “一个”   “一个”)；const    ;常量link = document      文档文档.createElement('a'   “一个”   “一个”);
+      链接.download   下载   下载 = ' MBTI-${currentMbti}.png '‘ MBTI-${currentMbti}.png ’‘    ’‘MBTI   它-${currentMbti}.png ’；link   ’;链接.download   下载   下载 = `MBTI-   MBTI -' mbti - mbti -${currentMbti}.png`   .png”   .png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”   png”;
+         链接.href = dataURL；link   dataURL;链接.href = dataURL;
+      link      链接链接.click   点击   点击();
+    }
+
+    // 事件绑定
+    startBtn .addEventListener——startTest无限点击”addEventListener——startTest无限点击”addEventListener——startTest无限点击”addEventListener——startTest无限点击”;startBtn.addEventListener('click'   “点击”   “点击”, startTest);
+    prevBtn.addEventListener('click'   “点击”   “点击”, goToPrev);
+    nextBtn .addEventListener——goToNext无限点击”addEventListener——goToNext无限点击”addEventListener——goToNext无限点击”addEventListener——goToNext无限点击”;nextBtn.addEventListener('click'   “点击”   “点击”, goToNext);
+    resultBtn。addEventListener(“点击”,showResult);resultBtn.addEventListener('click'   “点击”   “点击”, showResult);
+    restartBtn。addEventListener(’click’   ’click’,resetToCover);restartBtn.addEventListener('click'   “点击”   “点击”, resetToCover);
+    saveCardBtn。addEventListener(“点击”,generateCard);saveCardBtn.addEventListener('click'   “点击”   “点击”, generateCard);
+
+    // 初始化
+    cover      封面封面.classList   班级名册   班级名册.remove   删除   删除(隐含);cover      封面封面.classList   班级名册   班级名册.remove   删除   删除('hidden'   “隐藏”   “隐藏”);
+    testArea.classList   班级名册   班级名册.add   添加   添加(隐含);testArea.classList   班级名册   班级名册.add   添加   添加('hidden'   “隐藏”   “隐藏”);
+    resultArea.classList   班级名册   班级名册.add   添加   添加(隐含);resultArea.classList   班级名册   班级名册.add   添加   添加('hidden'   “隐藏”   “隐藏”);
+  })();
+</script>   < / script>
+</body>   < / body>
+</html>   < / html>
